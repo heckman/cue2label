@@ -1,0 +1,61 @@
+#!/usr/bin/env awk -f
+# Copyright 2024 Erik Ben Heckman <erik@heckman.ca>
+# SPDX-License-Identifier: MIT
+
+
+# cue2labels
+
+
+# v0.1
+#
+# given a .cue sheet output an audacity labels file
+#
+# usage: cue2label < foo.cue > foo.labels
+
+
+function label_name(i){
+		# availabe fields: title, artist, track_number, date, genre
+		# use the subscript 0 for album title, artist, etc.
+		# (values not provided by the cue sheet will be empty strings)
+		# for example:
+		# return(artist[0]" - "title[0]" ("date") - "track_number[i]": "title[i])
+		return(title[i])
+}
+function strip_quotes(s){
+	first=substr(s, 1, 1)
+	last=substr(s, length(s))
+	if((first=="\""||first=="'")&&(first==last)){
+		return(substr(s, 2, length(s)-2))
+	}else{
+		return(s)
+	}
+}
+# times in cue files are formatted as HH:MM:SS:FF
+# where FF is frames, 75 of which are in a second
+function to_seconds(time_string){
+	split(time_string,f,":")
+	n=length(f)
+	return(f[n]/75+f[n-1]+f[n-2]*60+f[n-3]*3600)
+}
+
+function get_value(){
+	match($0,"^ *"$1" ")
+	return(strip_quotes(substr($0,RLENGTH+1)))
+}
+
+$1=="DATE" { date[segment]=get_value(); next }
+$1=="GENRE" { genre[segment]=get_value(); next }
+$1=="TITLE" { title[segment]=get_value(); next }
+$1=="PERFORMER" { artist[segment]=get_value(); next }
+$1=="TRACK" {	segment++; track_number[segment]=$2; next }
+$1=="INDEX" { t=to_seconds($3)
+	if(start[segment]==""){start[segment]=t}else{end[segment]=t}
+	next
+}
+END {
+	for(i=1;i<=segment;i++){
+		if(end[i]=="")end[i]=start[i+1]
+		printf("%0.6f\t%0.6f\t%s\n",start[i],end[i],label_name(i))
+	}
+}
+
