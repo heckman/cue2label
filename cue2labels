@@ -10,7 +10,7 @@
 #
 # given a .cue sheet output an audacity labels file
 #
-# usage: cue2label < foo.cue > foo.labels
+# usage: cue2labels < foo.cue > foo.labels
 
 
 function label_name(i){
