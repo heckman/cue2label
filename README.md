@@ -1,6 +1,6 @@
 # cue2label
 
-Given a .cue sheet prints an audacity labels file to standard out.
+Given a .cue sheet prints an audacity labels file to standard output.
 
 ## Usage
 
