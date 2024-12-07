@@ -1,11 +1,11 @@
-# cue2label
+# cue2labels
 
 Given a .cue sheet prints an audacity labels file to standard output.
 
 ## Usage
 
 ```
-cue2label < foo.cue > foo.labels
+cue2labels < foo.cue > foo.labels
 ```
 
 ## Dependencies
